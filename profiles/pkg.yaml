@@ -1,5 +1,5 @@
 name: profiles
 variant: scratch
 finalize:
-  - from: /pkg/board
+  - from: /pkg/jetson_nano
     to: /rootfs/profiles

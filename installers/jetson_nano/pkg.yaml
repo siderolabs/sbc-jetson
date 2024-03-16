@@ -1,4 +1,4 @@
-name: board
+name: jetson_nano
 variant: scratch
 shell: /toolchain/bin/bash
 dependencies:
@@ -14,12 +14,12 @@ steps:
         export PATH=${PATH}:${TOOLCHAIN}/go/bin
 
         cd /pkg/src
-        CGO_ENABLED=0 go build -o ./board .
+        CGO_ENABLED=0 go build -o ./jetson_nano .
     install:
       - |
         mkdir -p /rootfs/installers/
 
-        cp -p /pkg/src/board /rootfs/installers/board
+        cp -p /pkg/src/jetson_nano /rootfs/installers/jetson_nano
 finalize:
   - from: /rootfs
     to: /rootfs

@@ -2,7 +2,7 @@
 kind: pkgfile.Build
 spec:
   targets:
-    - sbc-board
+    - sbc-jetson
   extraBuildArgs:
     - PKGS_PREFIX
     - PKGS

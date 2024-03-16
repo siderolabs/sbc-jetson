@@ -1,10 +1,14 @@
-name: sbc-board
+name: sbc-jetson
 variant: scratch
 dependencies:
-  - stage: board
+  - stage: jetson_nano
   - stage: u-boot
     platform: linux/arm64
   - stage: profiles
+  - image: "{{ .BUILD_ARG_PKGS_PREFIX }}/kernel:{{ .BUILD_ARG_PKGS }}"
+    platform: linux/arm64
+    from: /dtb/nvidia/tegra210-p3450-0000.dtb
+    to: /rootfs/artifacts/arm64/dtb/nvidia/tegra210-p3450-0000.dtb
 finalize:
   - from: /rootfs
     to: /
