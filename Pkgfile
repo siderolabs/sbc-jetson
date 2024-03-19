@@ -3,4 +3,4 @@
 format: v1alpha2
 
 labels:
-  org.opencontainers.image.source: https://github.com/siderolabs/sbc-raspberrypi
+  org.opencontainers.image.source: https://github.com/siderolabs/sbc-jetson
