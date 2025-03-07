@@ -14,6 +14,8 @@ steps:
         sha512: 986e79cfe56878f17750144c8e21f03a9f802d94b7e39ca7268336422f8ab99268d85a4debe5c8f48e25a31f8e1e37e02b3fad448c2737dee286fb07486a06ba
     env:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
+      PATH: /toolchain/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    network: default
     prepare:
       - |
         mkdir -p /usr/bin \
