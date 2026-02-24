@@ -1,3 +1,30 @@
+## [sbc-jetson 0.1.4](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.4) (2026-02-24)
+
+Welcome to the v0.1.4 release of sbc-jetson!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/sbc-jetson/issues.
+
+### Contributors
+
+* Noel Georgi
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`501152e`](https://github.com/siderolabs/sbc-jetson/commit/501152e6d813abf1e82943de0b27160f239757c2) fix: directory creation permissions
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.1.3](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.3)
+
 ## [sbc-jetson 0.1.3](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.3) (2025-11-13)
 
 Welcome to the v0.1.3 release of sbc-jetson!
