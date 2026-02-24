@@ -8,25 +8,74 @@ dependencies:
   - stage: base
 steps:
   - sources:
-      - url: https://github.com/OE4T/u-boot-tegra/archive/refs/tags/v2022.07.tar.gz
+      - url: https://github.com/u-boot/u-boot/archive/refs/tags/v2026.01.tar.gz
         destination: u-boot.tar.bz2
-        sha256: e8f03d0b3dc2d70db5833f0e6f3ac305c0de0d71ff823c7d6210edee68e29a46
-        sha512: 986e79cfe56878f17750144c8e21f03a9f802d94b7e39ca7268336422f8ab99268d85a4debe5c8f48e25a31f8e1e37e02b3fad448c2737dee286fb07486a06ba
+        sha256: 03bb43c58d2343ee48dd191e0f181f0108425b179d84519add3a977071c3f654 
+        sha512: bf621285c526afbd22886ace2f04554dad3edc0b0d3c1bd095a851abe6e78676d1197904670a02e745959d83825bc798136970b9b1b87759c1891e4e77e11c01
+      # NVIDIA L4T BSP for prebuilt DTBs (Orin Nano/AGX Orin support)
+      - url: https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/release/Jetson_Linux_r36.4.4_aarch64.tbz2
+        destination: nvidia-l4t.tbz2
+        sha256: a6ce11c22100ab0976e419959182417c83d62f4272501bc8714f2e076e010f3b
+        sha512: eccea1d2ce1907c853b1a282aa4c018585b001633c36452e33f166a4ef507da009fec6487d6a8f8b97054e787c6d79a9b72a8362712956e9e441cfba5c7df599
     env:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
     prepare:
       - |
         tar xf u-boot.tar.bz2 --strip-components=1
-      - |
+        
+        # Extract NVIDIA L4T DTBs
+        mkdir -p nvidia-dtbs
+        tar -xf nvidia-l4t.tbz2 -C nvidia-dtbs --strip-components=1
+        
+        # Find and copy required DTB files from L4T package
+        # Orin Nano: Use standard variant (0000 revision)
+        find nvidia-dtbs -path "*/dtb/tegra234-p3768-0000+p3767-0000*.dtb" -not -name "*nv*" -exec cp {} dtb-jetson-orin-nano.dtb \; || \
+        find nvidia-dtbs -path "*/dtb/tegra234-p3768-*+p3767-*.dtb" -not -name "*nv*" | head -1 | xargs -I {} cp {} dtb-jetson-orin-nano.dtb || \
+        echo "Warning: Orin Nano DTB not found in L4T package"
+        
+        # AGX Orin: Use standard variant (0000 revision)  
+        find nvidia-dtbs -path "*/dtb/tegra234-p3737-0000+p3701-0000*.dtb" -not -name "*nv*" -exec cp {} dtb-jetson-agx-orin.dtb \; || \
+        find nvidia-dtbs -path "*/dtb/tegra234-p3737-*+p3701-*.dtb" -not -name "*nv*" | head -1 | xargs -I {} cp {} dtb-jetson-agx-orin.dtb || \
+        echo "Warning: AGX Orin DTB not found in L4T package"
+        
+        # Build for Jetson Nano (Tegra210)
         make p3450-0000_defconfig
         sed -i "s/CONFIG_TOOLS_LIBCRYPTO=y/# CONFIG_TOOLS_LIBCRYPTO is not set/" .config
     build:
       - |
+        # Build U-Boot for Jetson Nano
         make -j $(nproc) HOSTLDLIBS_mkimage="-lssl -lcrypto"
+        cp u-boot.bin u-boot-jetson-nano.bin
+        
+        # Copy Jetson Nano DTB (built by U-Boot)
+        if [ -f arch/arm/dts/tegra210-p3450-0000.dtb ]; then
+          cp arch/arm/dts/tegra210-p3450-0000.dtb dtb-jetson-nano.dtb
+        fi
+        
+        # Note: Orin models use prebuilt DTBs from NVIDIA L4T since
+        # mainline U-Boot v2026.01 doesn't have Tegra234 board configs yet
+        echo "Using prebuilt NVIDIA DTBs for Orin models:"
+        ls -la dtb-jetson-*.dtb 2>/dev/null || echo "No Orin DTBs found"
     install:
       - |
         mkdir -p /rootfs/artifacts/arm64/u-boot/jetson_nano
-        cp -v u-boot.bin /rootfs/artifacts/arm64/u-boot/jetson_nano
+        mkdir -p /rootfs/artifacts/arm64/dtb/nvidia
+        
+        # Install Jetson Nano U-Boot and DTB
+        cp -v u-boot-jetson-nano.bin /rootfs/artifacts/arm64/u-boot/jetson_nano/u-boot.bin
+        
+        if [ -f dtb-jetson-nano.dtb ]; then
+          cp -v dtb-jetson-nano.dtb /rootfs/artifacts/arm64/dtb/nvidia/tegra210-p3450-0000.dtb
+        fi
+        
+        # Install Orin DTBs from NVIDIA L4T (no U-Boot binaries since configs don't exist yet)
+        if [ -f dtb-jetson-orin-nano.dtb ]; then
+          cp -v dtb-jetson-orin-nano.dtb /rootfs/artifacts/arm64/dtb/nvidia/tegra234-p3768-0000+p3767-0000.dtb
+        fi
+        
+        if [ -f dtb-jetson-agx-orin.dtb ]; then
+          cp -v dtb-jetson-agx-orin.dtb /rootfs/artifacts/arm64/dtb/nvidia/tegra234-p3701-0000+p3737-0000.dtb
+        fi
 finalize:
   - from: /rootfs
     to: /rootfs

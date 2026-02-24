@@ -1,14 +1,42 @@
 name: sbc-jetson
 variant: scratch
 dependencies:
+  # Currently only Jetson Nano is supported with U-Boot
   - stage: jetson_nano
   - stage: u-boot
     platform: linux/arm64
   - stage: profiles
-  - image: "{{ .BUILD_ARG_PKGS_PREFIX }}/kernel:{{ .BUILD_ARG_PKGS }}"
-    platform: linux/arm64
-    from: /dtb/nvidia/tegra210-p3450-0000.dtb
-    to: /rootfs/artifacts/arm64/dtb/nvidia/tegra210-p3450-0000.dtb
+
 finalize:
   - from: /rootfs
     to: /
+
+stages:
+  # Main installer stage - Jetson Nano only for now
+  - name: jetson_nano
+    dependencies:
+      - stage: u-boot
+        runtime: true
+        from: /artifacts/arm64/u-boot/jetson_nano/u-boot.bin
+        to: /artifacts/arm64/u-boot/jetson_nano/u-boot.bin
+      # DTB now provided by U-Boot stage  
+      - stage: u-boot
+        runtime: true
+        from: /artifacts/arm64/dtb/nvidia/tegra210-p3450-0000.dtb
+        to: /artifacts/arm64/dtb/nvidia/tegra210-p3450-0000.dtb
+    build:
+      - |
+        mkdir -p /rootfs/jetson_nano
+        cd installers/jetson_nano/src
+        go mod download
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /rootfs/jetson_nano/installer .
+    install:
+      - |
+        mkdir -p /rootfs/artifacts/arm64/installer/jetson_nano
+        cp -r /rootfs/jetson_nano/* /rootfs/artifacts/arm64/installer/jetson_nano/
+
+  # TODO: Add Orin support when U-Boot configs become available
+  # jetson_orin_nano:
+  #   - Waiting for p3767-0000_defconfig in mainline U-Boot
+  # jetson_agx_orin:
+  #   - Waiting for p3701-0000_defconfig in mainline U-Boot
