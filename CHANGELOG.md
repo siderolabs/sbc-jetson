@@ -1,3 +1,30 @@
+## [sbc-jetson 0.1.5](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.5) (2026-02-25)
+
+Welcome to the v0.1.5 release of sbc-jetson!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/sbc-jetson/issues.
+
+### Contributors
+
+* Noel Georgi
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`5855a93`](https://github.com/siderolabs/sbc-jetson/commit/5855a930998cc4606e235409d7ce26f49fddb818) feat: bump tools and pkgs
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.1.4](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.4)
+
 ## [sbc-jetson 0.1.4](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.4) (2026-02-24)
 
 Welcome to the v0.1.4 release of sbc-jetson!
