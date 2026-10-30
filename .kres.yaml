@@ -13,13 +13,20 @@ spec:
       - name: PKGS_PREFIX
         defaultValue: ghcr.io/siderolabs
       - name: PKGS
-        defaultValue: v1.13.0-alpha.0
+        defaultValue: v1.15.0-alpha.0-67-gff868eb
       - name: TOOLS_PREFIX
         defaultValue: ghcr.io/siderolabs
       - name: TOOLS
-        defaultValue: v1.13.0-alpha.0
+        defaultValue: v1.15.0-alpha.0-16-g54f72f9
 ---
 kind: common.Build
 spec:
-    ignoredPaths:
-      - go.work.sum
+  ignoredPaths:
+    - go.work.sum
+---
+kind: common.Renovate
+spec:
+  packageRules:
+    - matchPackageNames:
+        - u-boot/u-boot
+      versioning: 'regex:^(?<major>\d+)\.(?<minor>\d+)(?<prerelease>-rc\d+)?$'
