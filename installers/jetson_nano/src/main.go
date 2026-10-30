@@ -5,8 +5,10 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/siderolabs/go-copy/copy"
@@ -17,21 +19,24 @@ import (
 
 const (
 	// References
-	// - https://github.com/u-boot/u-boot/blob/v2021.10/configs/p3450-0000_defconfig#L8
-	// - https://github.com/u-boot/u-boot/blob/v2021.10/include/configs/tegra-common.h#L53
-	// - https://github.com/u-boot/u-boot/blob/v2021.10/include/configs/tegra210-common.h#L49
+	// - https://github.com/u-boot/u-boot/blob/v2026.10/configs/p3450-0000_defconfig#L14
+	// - https://github.com/u-boot/u-boot/blob/v2026.10/include/configs/tegra-common.h#L26
+	// - https://github.com/u-boot/u-boot/blob/v2026.10/include/configs/tegra210-common.h#L45
 	dtb = "nvidia/tegra210-p3450-0000.dtb"
 )
 
 func main() {
-	adapter.Execute(&JetsonNanoInstaller{})
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	adapter.Execute(ctx, &JetsonNanoInstaller{})
 }
 
 type JetsonNanoInstaller struct{}
 
 type jetsonNanoExtraOptions struct{}
 
-func (i *JetsonNanoInstaller) GetOptions(extra jetsonNanoExtraOptions) (overlay.Options, error) {
+func (i *JetsonNanoInstaller) GetOptions(_ context.Context, extra jetsonNanoExtraOptions) (overlay.Options, error) {
 	return overlay.Options{
 		Name: "jetson_nano",
 		KernelArgs: []string{
@@ -43,7 +48,7 @@ func (i *JetsonNanoInstaller) GetOptions(extra jetsonNanoExtraOptions) (overlay.
 	}, nil
 }
 
-func (i *JetsonNanoInstaller) Install(options overlay.InstallOptions[jetsonNanoExtraOptions]) error {
+func (i *JetsonNanoInstaller) Install(_ context.Context, options overlay.InstallOptions[jetsonNanoExtraOptions]) error {
 	var f *os.File
 
 	f, err := os.OpenFile(options.InstallDisk, os.O_RDWR|unix.O_CLOEXEC, 0o666)

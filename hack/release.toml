@@ -5,7 +5,22 @@ project_name = "sbc-jetson"
 github_repo = "siderolabs/sbc-jetson"
 match_deps = "^github.com/(siderolabs/[a-zA-Z0-9-]+)$"
 
-previous = "v0.1.4"
+previous = "v0.1.5"
 pre_release = false
 
-# [notes]
+[notes]
+
+    [notes.updates]
+        title = "Component Updates"
+        description = """\
+* Linux: 7.3 (via siderolabs/pkgs)
+* U-Boot: 2026.10
+"""
+
+    [notes.uboot]
+        title = "U-Boot"
+        description = """\
+U-Boot for the Jetson Nano is now built from mainline U-Boot 2026.10 (previously 2022.07),
+and its version is tracked in the `Pkgfile` so it is kept up to date automatically.
+If you flash U-Boot to the QSPI flash of your Jetson Nano, use the `u-boot.bin` shipped with this release.
+"""

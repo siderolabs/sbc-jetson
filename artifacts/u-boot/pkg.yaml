@@ -1,6 +1,7 @@
 # References:
 #   U-Boot:
 #     - https://u-boot.readthedocs.io/en/latest
+#     - https://docs.u-boot.org/en/latest/board/nvidia/index.html
 name: u-boot
 variant: scratch
 shell: /bin/bash
@@ -8,18 +9,21 @@ dependencies:
   - stage: base
 steps:
   - sources:
-      - url: https://github.com/OE4T/u-boot-tegra/archive/refs/tags/v2022.07.tar.gz
-        destination: u-boot.tar.bz2
-        sha256: e8f03d0b3dc2d70db5833f0e6f3ac305c0de0d71ff823c7d6210edee68e29a46
-        sha512: 986e79cfe56878f17750144c8e21f03a9f802d94b7e39ca7268336422f8ab99268d85a4debe5c8f48e25a31f8e1e37e02b3fad448c2737dee286fb07486a06ba
+      - url: https://github.com/u-boot/u-boot/archive/refs/tags/v{{ .uboot_version }}.tar.gz
+        destination: u-boot.tar.gz
+        sha256: "{{ .uboot_sha256 }}"
+        sha512: "{{ .uboot_sha512 }}"
     env:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
     prepare:
       - |
-        tar xf u-boot.tar.bz2 --strip-components=1
+        tar xf u-boot.tar.gz --strip-components=1
       - |
         make p3450-0000_defconfig
-        sed -i "s/CONFIG_TOOLS_LIBCRYPTO=y/# CONFIG_TOOLS_LIBCRYPTO is not set/" .config
+        # Host tools: image signing needs the OpenSSL ENGINE API (removed in the toolchain's OpenSSL),
+        # and mkeficapsule needs gnutls with PKCS#11 support; neither is used to build u-boot.bin.
+        ./scripts/config --disable TOOLS_LIBCRYPTO --disable TOOLS_KWBIMAGE --disable TOOLS_MKEFICAPSULE
+        make olddefconfig
     build:
       - |
         make -j $(nproc) HOSTLDLIBS_mkimage="-lssl -lcrypto"
