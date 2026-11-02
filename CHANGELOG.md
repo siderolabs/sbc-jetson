@@ -1,3 +1,43 @@
+## [sbc-jetson 0.2.0](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.2.0) (2026-11-02)
+
+Welcome to the v0.2.0 release of sbc-jetson!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/sbc-jetson/issues.
+
+### U-Boot
+
+U-Boot for the Jetson Nano is now built from mainline U-Boot 2026.10 (previously 2022.07),
+and its version is tracked in the `Pkgfile` so it is kept up to date automatically.
+If you flash U-Boot to the QSPI flash of your Jetson Nano, use the `u-boot.bin` shipped with this release.
+
+
+### Component Updates
+
+* Linux: 7.3 (via siderolabs/pkgs)
+* U-Boot: 2026.10
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`5b8b5c5`](https://github.com/siderolabs/sbc-jetson/commit/5b8b5c51689ff25dc8aa0837e02cd0585e4a1a14) feat: update dependencies
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.1.5](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.5)
+
 ## [sbc-jetson 0.1.5](https://github.com/siderolabs/sbc-jetson/releases/tag/v0.1.5) (2026-02-25)
 
 Welcome to the v0.1.5 release of sbc-jetson!
